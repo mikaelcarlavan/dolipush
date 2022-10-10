@@ -1,0 +1,66 @@
+# Copyright (C) 2017 Mikael Carlavan <contact@mika-carl.fr>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#
+# Générique
+#
+
+# Module label 'ModuleDoliPushName'
+ModuleDoliPushName = DoliPush
+# Module description 'ModuleDoliPushDesc'
+ModuleDoliPushDesc = Module permettant de recevoir des SMS via Octopush
+
+#
+# Page d'administration
+#
+DoliPushSetup = Configuration du module
+Settings = Réglages
+DoliPushSetupPage = Page de réglage du module
+DoliPushOptions = Options
+Description = Description
+Value = Valeur
+Action = Action
+DoliPushsNumberingModules = Modèle de numérotation de dolipushs
+NextValue=Prochaine valeur
+NoDescription=Aucune description
+NoExample=Aucun exemple
+NotAvailable=Non disponible
+DoliPush = DoliPush
+DescDOLIPUSH_KEY = Clé Octopush API
+DescDOLIPUSH_LOGIN = Login Octopush API
+#
+# Page À propos
+#
+About = À propos
+DoliPushAbout = À propos du module
+DoliPushAboutPage = Page à propos du module
+DoliPushAboutDescLong = Ce module a été développé par <a href="http://www.mikael-carlavan.fr">Mikael Carlavan</a> pour <a href="https://veloma.org">Véloma</a>.
+
+# ChangeLog
+ChangeLog = ChangeLog
+ChangeLogVersion = Version
+ChangeLogDate = Date
+ChangeLogUpdates = Modification apportées
+DoliPushFirstVersion = Première version
+
+#
+ErrorWhileCreatingDoliPush = Erreur lors de la création du SMS.
+DoliPushHasBeenCreated = Votre SMS %s a bien été enregistré.
+
+#
+DoliPushMessageId = Message Id
+DoliPushNumber = Numéro
+DoliPushText = Texte
+DoliPushSimCardNumber = Numéro carte SIM
