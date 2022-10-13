@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `llx_dolipush`
     `datec`           datetime     NULL,
     `user_author_id`  int(11) DEFAULT 0,
     `entity`          int(11) DEFAULT 0,
+    `type`          int(11) DEFAULT 0,
     `tms`             timestamp    NOT NULL,
     PRIMARY KEY (`rowid`)
 ) ENGINE = innodb

@@ -104,6 +104,7 @@ class DoliPushApi extends DolibarrApi
         $object->number = $number;
         $object->text = $text;
         $object->sim_card_number = $sim_card_number;
+        $object->type = $object::TYPE_RECEIVED;
 
         if ($object->create($user) < 0) {
             throw new RestException(500, $langs->transnoentities('ErrorWhileCreatingDoliPush'));

@@ -40,6 +40,7 @@ NotAvailable=Non disponible
 DoliPush = DoliPush
 DescDOLIPUSH_KEY = Clé Octopush API
 DescDOLIPUSH_LOGIN = Login Octopush API
+DescDOLIPUSH_SENDER = Nom utilisé pour l'envoi des SMS (3-11 caractères alphanumériques et espace).
 #
 # Page À propos
 #
@@ -64,3 +65,4 @@ DoliPushMessageId = Message Id
 DoliPushNumber = Numéro
 DoliPushText = Texte
 DoliPushSimCardNumber = Numéro carte SIM
+DoliPushType = Type

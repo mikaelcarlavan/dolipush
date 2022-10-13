@@ -99,6 +99,12 @@ class DoliPush extends CommonObject
      */
     public $sim_card_number = null;
 
+    /**
+     * Sent or received
+     * @var int
+     */
+    public $type = 0;
+
 	/**
 	 * Creation date
 	 * @var int
@@ -123,7 +129,15 @@ class DoliPush extends CommonObject
      */
 	public $entity;
 
+    /**
+     * Sent type
+     */
+    const TYPE_SENT = 0;
 
+    /**
+     * Received type
+     */
+    const TYPE_RECEIVED = 1;
 	/**
 	 *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
 	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
@@ -156,10 +170,11 @@ class DoliPush extends CommonObject
 		'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
 		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>15, 'index'=>1),
         'message_id' =>array('type'=>'varchar(255)', 'label'=>'DoliPushMessageId', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'position'=>20),
-        'number' =>array('type'=>'varchar(30)', 'label'=>'DoliPushNumber', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'position'=>20),
+        'number' =>array('type'=>'varchar(30)', 'label'=>'DoliPushNumber', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'position'=>25),
 		'text' =>array('type'=>'text', 'label'=>'DoliPushText', 'enabled'=>1, 'visible'=>1, 'position'=>30),
 		'sim_card_number' =>array('type'=>'varchar(255)', 'label'=>'DoliPushSimCardNumber', 'enabled'=>1, 'visible'=>1, 'position'=>35),
-		'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
+        'type' =>array('type'=>'integer', 'label'=>'DoliPushType', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>40, 'index'=>1),
+        'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
 		'user_author_id' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fk user author', 'enabled'=>1, 'visible'=>-1, 'position'=>80),
 		'tms' =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>100)
 		);
@@ -207,6 +222,7 @@ class DoliPush extends CommonObject
         $sql.= " , number";
         $sql.= " , sim_card_number";
         $sql.= " , text";
+        $sql.= " , type";
         $sql.= " , datec";
         $sql.= " , user_author_id";
         $sql.= " , entity";
@@ -216,6 +232,7 @@ class DoliPush extends CommonObject
         $sql.= ", ".(!empty($this->number) ? "'".$this->db->escape($this->number)."'" : "null");
         $sql.= ", ".(!empty($this->sim_card_number) ? "'".$this->db->escape($this->sim_card_number)."'" : "null");
         $sql.= ", ".(!empty($this->text) ? "'".$this->db->escape($this->text)."'" : "null");
+        $sql.= ", ".(!empty($this->type) ? $this->type : "0");
         $sql.= ", ".(!empty($this->datec) ? "'".$this->db->idate($this->datec)."'" : "null");
         $sql.= ", ".(!empty($this->user_author_id) ? $this->user_author_id : "0");
         $sql.= ", ".(!empty($this->entity) ? $this->entity : "0");
@@ -297,7 +314,7 @@ class DoliPush extends CommonObject
             return -1;
         }
 
-		$sql = "SELECT e.rowid, e.datec, e.tms, e.message_id, e.text, e.sim_card_number, e.number, e.user_author_id, e.entity ";
+		$sql = "SELECT e.rowid, e.datec, e.tms, e.message_id, e.text, e.type, e.sim_card_number, e.number, e.user_author_id, e.entity ";
 		$sql.= " FROM ".MAIN_DB_PREFIX."dolipush e";
         if ($id > 0) {
             $sql.= " WHERE e.rowid=".$id;
@@ -322,6 +339,7 @@ class DoliPush extends CommonObject
 				$this->text 	        = $obj->text;
 				$this->number 	        = $obj->number;
 				$this->sim_card_number 	= $obj->sim_card_number;
+                $this->type 		    = $obj->type;
 
 				$this->entity			= $obj->entity;
 
@@ -569,4 +587,73 @@ class DoliPush extends CommonObject
 			return -1;
 		}
 	}
+
+    /**
+     *  Return list of dolipushs
+     *
+     *  @return     int             		-1 if KO, array with result if OK
+     */
+    function send($number = '', $text = '')
+    {
+        global $conf, $user, $langs;
+
+        $url = 'https://api.octopush.com/v1/public/sms-campaign/send';
+
+        $params = array(
+            'recipients' => array(
+                0 => array(
+                    'phone_number' => $number,
+                )
+            ),
+            'text' => $text,
+            'type' => 'sms_premium',
+            'purpose' => 'alert',
+            'sender' => $conf->global->DOLIPUSH_SENDER
+        );
+
+        $result = $this->call($url, $params);
+
+        dol_syslog("DoliPush::send '".json_encode($result));
+
+        if ($result && isset($result->sms_ticket)) {
+            $dolipush = new DoliPush($this->db);
+            $dolipush->message_id = $result->sms_ticket;
+            $dolipush->text = $text;
+            $dolipush->number = $number;
+            $dolipush->type = DoliPush::TYPE_SENT;
+
+            $dolipush->create($user);
+        }
+
+        return $result;
+    }
+
+    public function call($url, $params = array()) {
+
+        global $conf;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+
+        curl_setopt($ch, CURLOPT_REFERER, DOL_URL_ROOT);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'api-key: '.$conf->global->DOLIPUSH_KEY,
+            'api-login: '.$conf->global->DOLIPUSH_LOGIN,
+            'Content-Type: application/json'
+        ));
+
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        if ($result) {
+            return json_decode($result);
+        } else {
+            return null;
+        }
+    }
 }
