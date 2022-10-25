@@ -85,7 +85,7 @@ class modDoliPush extends DolibarrModules
 		// for specific path of parts (eg: /dolipush/core/modules/barcode)
 		// for specific css file (eg: /dolipush/css/dolipush.css.php)
 		$this->module_parts = array(
-            'triggers' => 0,                                 	// Set this to 1 if module has its own trigger directory (core/triggers)
+            'triggers' => 1,                                 	// Set this to 1 if module has its own trigger directory (core/triggers)
             'login' => 0,                                    	// Set this to 1 if module has its own login method directory (core/login)
             'substitutions' => 0,                            	// Set this to 1 if module has its own substitution function file (core/substitutions)
             'menus' => 0,                                    	// Set this to 1 if module has its own menus handler directory (core/menus)

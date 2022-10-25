@@ -271,13 +271,18 @@ class DoliPush extends CommonObject
 
 		if (! $error)
 		{
-			if (! $notrigger)
-			{
-	            // Call trigger
-	            $result = $this->call_trigger('DOLIPUSH_CREATE',$user);
-	            if ($result < 0) $error++;
-	            // End call triggers
-			}
+            if (! $notrigger)
+            {
+                if ($this->type == $this::TYPE_SENT) {
+                    $result = $this->call_trigger('DOLISMS_SENT',$user);
+                } else {
+                    $result = $this->call_trigger('DOLISMS_RECEIVED',$user);
+                }
+
+                // Call trigger
+                if ($result < 0) $error++;
+                // End call triggers
+            }
 		}
 
 		if (! $error)
@@ -417,7 +422,7 @@ class DoliPush extends CommonObject
 			if (! $notrigger)
 			{
 	            // Call trigger
-	            $result = $this->call_trigger('DOLIPUSH_DELETE',$user);
+	            $result = $this->call_trigger('DOLISMS_DELETE',$user);
 	            if ($result < 0) $error++;
 	            // End call triggers
 			}
